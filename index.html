@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Codificatore Avanzato</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #eee;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* ===== ANIMAZIONE ENTRATA PAGINA ===== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 850px;
+      background: #121212;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #4fc3f7;
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: #81d4fa;
+    }
+
+    h3 {
+      margin-top: 20px;
+      color: #b3e5fc;
+    }
+
+    p {
+      line-height: 1.6;
+      color: #ccc;
+    }
+
+    textarea,
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 18px;
+      border-radius: 10px;
+      border: none;
+      background: #1e1e1e;
+      color: #eee;
+      font-size: 15px;
+      transition: box-shadow 0.2s ease;
+    }
+
+    textarea:focus,
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #4fc3f7;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    /* ===== BOTTONI ANIMATI ===== */
+    button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(135deg, #4fc3f7, #0288d1);
+      color: #121212;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 0 10px rgba(79, 195, 247, 0.4);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(79, 195, 247, 0.8);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 0 10px rgba(79, 195, 247, 0.4);
+    }
+
+    /* ===== OUTPUT ===== */
+    .output {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 12px;
+      min-height: 60px;
+      font-family: "Courier New", monospace;
+      word-wrap: break-word;
+      border: 1px solid #333;
+    }
+
+    /* ===== ANIMAZIONE OUTPUT ===== */
+    @keyframes popResult {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .output.animate {
+      animation: popResult 0.3s ease-out;
+    }
+
+    hr {
+      margin: 40px 0;
+      border: none;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #444, transparent);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Codificatore e Decodificatore di Testo</h1>
+
+  <p>
+    Questo sito permette di codificare e decodificare un messaggio utilizzando
+    più tecniche di crittografia, rendendo il testo non leggibile senza la
+    chiave corretta.
+  </p>
+
+  <h2>Testo</h2>
+  <textarea id="inputText" rows="4" placeholder="Scrivi qui il testo..."></textarea>
+
+  <h2>Chiave numerica</h2>
+  <input type="number" id="key" placeholder="Inserisci una chiave (es. 3)">
+
+  <div class="buttons">
+    <button onclick="encode()">Codifica</button>
+    <button onclick="decode()">Decodifica</button>
+  </div>
+
+  <h2>Risultato</h2>
+  <div class="output" id="output"></div>
+
+  <hr>
+
+  <h2>Spiegazione delle codifiche utilizzate</h2>
+
+  <h3>Cifrario di Cesare</h3>
+  <p>
+    Il cifrario di Cesare è una delle tecniche di crittografia più antiche.
+    Consiste nello spostare ogni lettera dell’alfabeto di un numero fisso
+    di posizioni, chiamato chiave.
+  </p>
+
+  <h3>Operazione XOR</h3>
+  <p>
+    Dopo il cifrario di Cesare, il testo viene ulteriormente modificato
+    tramite l’operazione logica XOR. Applicando l’operazione due volte
+    con la stessa chiave si ottiene il testo originale.
+  </p>
+
+  <h3>Codifica Base64</h3>
+  <p>
+    Infine, il testo viene convertito in Base64. La Base64 non è una vera
+    crittografia, ma una codifica che rende il testo non leggibile a prima vista
+    e adatta alla trasmissione dei dati.
+  </p>
+
+  <footer>
+    Progetto di Informatica – Codifica dei dati
+  </footer>
+</div>
+
+<script>
+  function cesarEncode(text, key) {
+    let result = "";
+    for (let char of text) {
+      result += String.fromCharCode(char.charCodeAt(0) + key);
+    }
+    return result;
+  }
+
+  function cesarDecode(text, key) {
+    let result = "";
+    for (let char of text) {
+      result += String.fromCharCode(char.charCodeAt(0) - key);
+    }
+    return result;
+  }
+
+  function xorCipher(text, key) {
+    let result = "";
+    for (let char of text) {
+      result += String.fromCharCode(char.charCodeAt(0) ^ key);
+    }
+    return result;
+  }
+
+  function encode() {
+    const text = document.getElementById("inputText").value;
+    const key = parseInt(document.getElementById("key").value);
+    const output = document.getElementById("output");
+
+    if (!text || isNaN(key)) {
+      alert("Inserisci testo e chiave!");
+      return;
+    }
+
+    let step1 = cesarEncode(text, key);
+    let step2 = xorCipher(step1, key);
+    let final = btoa(step2);
+
+    output.innerText = final;
+    output.classList.remove("animate");
+    void output.offsetWidth;
+    output.classList.add("animate");
+  }
+
+  function decode() {
+    const text = document.getElementById("inputText").value;
+    const key = parseInt(document.getElementById("key").value);
+    const output = document.getElementById("output");
+
+    if (!text || isNaN(key)) {
+      alert("Inserisci testo e chiave!");
+      return;
+    }
+
+    try {
+      let step1 = atob(text);
+      let step2 = xorCipher(step1, key);
+      let final = cesarDecode(step2, key);
+
+      output.innerText = final;
+      output.classList.remove("animate");
+      void output.offsetWidth;
+      output.classList.add("animate");
+    } catch {
+      alert("Errore nella decodifica. Controlla il testo o la chiave.");
+    }
+  }
+</script>
+
+</body>
+</html>
